@@ -44,32 +44,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             },
         }),
     ],
-    // AQUÍ ESTÁ EL ARREGLO DEL ID 👇
     callbacks: {
-        authorized({ auth, request: { nextUrl } }) {
-            const isLoggedIn = !!auth?.user;
-            const pathname = nextUrl.pathname;
-
-            // Rutas protegidas
-            const protectedRoutes = ['/dashboard', '/reservar', '/admin'];
-            const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
-
-            // Páginas de autenticación
-            const authRoutes = ['/login', '/register'];
-            const isAuthRoute = authRoutes.includes(pathname);
-
-            // Si intenta acceder a ruta protegida sin estar logueado
-            if (isProtectedRoute && !isLoggedIn) {
-                return false; // Esto redirige automáticamente a signIn page
-            }
-
-            // Si está logueado e intenta acceder a login/register, redirigir a dashboard
-            if (isLoggedIn && isAuthRoute) {
-                return Response.redirect(new URL('/dashboard', nextUrl));
-            }
-
-            return true;
-        },
         async jwt({ token, user }) {
             // "user" solo existe la primera vez que inicias sesión.
             if (user) {

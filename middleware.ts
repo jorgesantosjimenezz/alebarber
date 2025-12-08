@@ -10,12 +10,17 @@ export default auth((req) => {
     const protectedRoutes = ['/dashboard', '/reservar', '/admin'];
     const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
 
+    // Public auth pages - usuarios ya logueados no deberían estar aquí
+    const publicAuthPages = ['/login', '/register', '/registro'];
+    const isAuthPage = publicAuthPages.some(page => pathname.startsWith(page));
+
+    // Redirigir a login si intenta acceder a ruta protegida sin estar logueado
     if (isProtectedRoute && !isLoggedIn) {
         return NextResponse.redirect(new URL('/login', req.url));
     }
 
-    // If logged in and trying to access login/register, redirect to dashboard
-    if (isLoggedIn && (pathname === '/login' || pathname === '/register')) {
+    // Redirigir a dashboard si está logueado e intenta acceder a páginas de auth
+    if (isLoggedIn && isAuthPage) {
         return NextResponse.redirect(new URL('/dashboard', req.url));
     }
 

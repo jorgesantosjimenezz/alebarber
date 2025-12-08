@@ -22,25 +22,30 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 password: { label: 'Password', type: 'password' },
             },
             async authorize(credentials) {
-                if (!credentials?.email || !credentials?.password) {
+                try {
+                    if (!credentials?.email || !credentials?.password) {
+                        return null;
+                    }
+
+                    const user = await authenticateUser(
+                        credentials.email as string,
+                        credentials.password as string
+                    );
+
+                    if (!user) {
+                        return null;
+                    }
+
+                    return {
+                        id: user.id,
+                        email: user.email,
+                        name: user.name,
+                        image: user.image,
+                    };
+                } catch (error) {
+                    console.error('Error in authorize:', error);
                     return null;
                 }
-
-                const user = await authenticateUser(
-                    credentials.email as string,
-                    credentials.password as string
-                );
-
-                if (!user) {
-                    return null;
-                }
-
-                return {
-                    id: user.id,
-                    email: user.email,
-                    name: user.name,
-                    image: user.image,
-                };
             },
         }),
     ],

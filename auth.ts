@@ -9,6 +9,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     session: {
         strategy: 'jwt',
     },
+    // IMPORTANTE: Esto ayuda a Vercel a manejar bien las redirecciones https
+    trustHost: true,
     pages: {
         signIn: '/login',
     },
@@ -23,16 +25,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 if (!credentials?.email || !credentials?.password) {
                     return null;
                 }
-
                 const user = await authenticateUser(
                     credentials.email as string,
                     credentials.password as string
                 );
+                if (!user) return null;
 
-                if (!user) {
-                    return null;
-                }
-
+                // Devolvemos el ID explícitamente
                 return {
                     id: user.id,
                     email: user.email,
@@ -44,13 +43,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     ],
     callbacks: {
         async jwt({ token, user }) {
+            // "user" solo existe la primera vez que inicias sesión.
             if (user) {
                 token.id = user.id;
             }
             return token;
         },
         async session({ session, token }) {
-            if (session.user) {
+            // Pasamos el ID del token a la sesión final
+            if (session.user && token.id) {
                 session.user.id = token.id as string;
             }
             return session;

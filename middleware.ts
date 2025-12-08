@@ -11,8 +11,8 @@ export default auth((req) => {
     const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
 
     // Public auth pages - usuarios ya logueados no deberían estar aquí
-    const publicAuthPages = ['/login', '/register', '/registro'];
-    const isAuthPage = publicAuthPages.some(page => pathname.startsWith(page));
+    const authPages = ['/login', '/register'];
+    const isAuthPage = authPages.some(page => pathname === page); // Cambiado a === para match exacto
 
     // Redirigir a login si intenta acceder a ruta protegida sin estar logueado
     if (isProtectedRoute && !isLoggedIn) {

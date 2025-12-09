@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Mail, Lock, LogIn, Sparkles } from 'lucide-react';
+import { Mail, Lock, LogIn, Sparkles, User } from 'lucide-react';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -48,14 +48,14 @@ export default function LoginPage() {
 
             <div className="max-w-md w-full relative z-10">
                 <div className="bg-white/80 dark:bg-[#1a1a1a]/80 backdrop-blur-xl rounded-3xl shadow-2xl p-10 border border-gray-200 dark:border-gray-800 animate-scale-in hover-glow">
-                    {/* Logo/Icon */}
+                    {/* User Icon/Logo */}
                     <div className="flex justify-center mb-6">
-                        <div className="p-4 gradient-primary rounded-2xl shadow-lg">
-                            <LogIn className="w-10 h-10 text-white" />
+                        <div className="p-5 gradient-primary rounded-full shadow-lg">
+                            <User className="w-12 h-12 text-white" />
                         </div>
                     </div>
 
-                    <h1 className="text-4xl font-bold text-center mb-3 gradient-primary bg-clip-text text-transparent">
+                    <h1 className="text-4xl font-bold text-center mb-3 text-[#B8860B] dark:text-[#DAA520]">
                         Bienvenido de Nuevo
                     </h1>
                     <p className="text-center text-gray-600 dark:text-gray-400 mb-8">

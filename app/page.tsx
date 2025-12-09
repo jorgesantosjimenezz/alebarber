@@ -5,7 +5,7 @@ export default function HomePage() {
   return (
     <main className="min-h-screen">
       {/* Hero Section - With Background Image */}
-      <section className="relative py-32 overflow-hidden bg-gray-900">
+      <section className="relative min-h-[calc(100vh-56px)] md:min-h-0 md:py-32 flex items-center overflow-hidden bg-gray-900">
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"

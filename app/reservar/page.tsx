@@ -91,6 +91,16 @@ export default function ReservarPage() {
         return date < today || date > maxDate;
     };
 
+    // Marcar días cerrados (martes = 2, jueves = 4) en rojo
+    const tileClassName = ({ date }: { date: Date }) => {
+        const dayOfWeek = date.getDay();
+        // Martes (2) y Jueves (4) son días cerrados
+        if (dayOfWeek === 2 || dayOfWeek === 4) {
+            return 'closed-day';
+        }
+        return '';
+    };
+
     return (
         <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-[#0a0a0a] dark:via-[#1a1a1a] dark:to-[#0a0a0a]">
             <div className="container mx-auto max-w-6xl">
@@ -126,6 +136,7 @@ export default function ReservarPage() {
                                     minDate={new Date()}
                                     maxDate={new Date(2026, 5, 30)}
                                     tileDisabled={tileDisabled}
+                                    tileClassName={tileClassName}
                                     locale="es-ES"
                                     className="custom-calendar"
                                 />
@@ -475,6 +486,21 @@ export default function ReservarPage() {
             transform: scale(1.05) !important;
             box-shadow: 0 4px 16px rgba(218, 165, 32, 0.4) !important;
           }
+        }
+
+        /* Días cerrados (martes y jueves) en rojo */
+        .custom-calendar .closed-day {
+          color: #dc2626 !important;
+        }
+
+        .custom-calendar .closed-day:enabled:hover {
+          background: #dc2626 !important;
+          color: white !important;
+        }
+
+        /* Quitar el color rojo de los fines de semana por defecto */
+        .custom-calendar .react-calendar__month-view__days__day--weekend {
+          color: inherit !important;
         }
 
         @keyframes shake {

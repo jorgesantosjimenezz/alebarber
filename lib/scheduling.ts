@@ -89,7 +89,6 @@ export async function getAvailableSlots(date: Date): Promise<Date[]> {
 
     const bookedAppointments = await prisma.appointment.findMany({
         where: {
-            status: 'CONFIRMED',
             startTime: {
                 gte: startOfDayUTC,
                 lte: endOfDayUTC,
@@ -141,7 +140,6 @@ export async function isSlotAvailable(startTime: Date): Promise<boolean> {
 
     const conflictingAppointment = await prisma.appointment.findFirst({
         where: {
-            status: 'CONFIRMED',
             OR: [
                 {
                     // New appointment starts during an existing appointment

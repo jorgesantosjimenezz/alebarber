@@ -42,9 +42,7 @@ export default async function AdminPage() {
 
     // Get statistics
     const totalUsers = await prisma.user.count();
-    const totalAppointments = await prisma.appointment.count({
-        where: { status: 'CONFIRMED' },
-    });
+    const totalAppointments = await prisma.appointment.count();
 
     return (
         <main className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] py-12 px-4">
@@ -85,7 +83,7 @@ export default async function AdminPage() {
                             </div>
                             <div>
                                 <p className="text-gray-600 dark:text-gray-400 text-sm">
-                                    Citas Confirmadas
+                                    Total Citas
                                 </p>
                                 <p className="text-3xl font-bold">{totalAppointments}</p>
                             </div>

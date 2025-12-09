@@ -18,7 +18,6 @@ export async function GET(req: NextRequest) {
         const appointments = await prisma.appointment.findMany({
             where: {
                 userId: session.user.id,
-                status: 'CONFIRMED',
                 startTime: {
                     gte: new Date(), // Only future appointments
                 },
@@ -86,7 +85,6 @@ export async function POST(req: NextRequest) {
                 userId: session.user.id,
                 startTime: startDateTime,
                 endTime: endDateTime,
-                status: 'CONFIRMED',
             },
         });
 

@@ -15,7 +15,6 @@ export default async function DashboardPage() {
     const appointments = await prisma.appointment.findMany({
         where: {
             userId: session.user.id,
-            status: 'CONFIRMED',
             startTime: {
                 gte: new Date(),
             },

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Scissors, Clock, Calendar, CheckCircle, Sparkles, Star, CalendarCheck } from 'lucide-react';
+import { Scissors, Clock, Calendar, CheckCircle, Sparkles, Star, CalendarCheck, Euro } from 'lucide-react';
 
 export default function HomePage() {
   return (
@@ -69,9 +69,9 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                icon: Scissors,
-                title: 'Corte Especializado',
-                description: 'Cortes perfectamente adaptados a tu estilo personal',
+                icon: Euro,
+                title: 'Precio ajustado',
+                description: 'Cortes personalizados sólo por 8€.',
                 delay: '0s'
               },
               {

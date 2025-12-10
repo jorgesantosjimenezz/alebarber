@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { format, addDays, startOfDay, isSameDay } from 'date-fns';
+import { format, addDays, startOfDay, isSameDay, isWithinInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 import Calendar from 'react-calendar';
@@ -85,14 +85,26 @@ export default function ReservarPage() {
         }
     };
 
+    // Período de vacaciones: 19 de diciembre 2025 al 12 de enero 2026
+    const vacationStart = new Date(2025, 11, 19); // 19 de diciembre 2025
+    const vacationEnd = new Date(2026, 0, 12); // 12 de enero 2026
+
+    const isVacationDay = (date: Date) => {
+        return isWithinInterval(date, { start: vacationStart, end: vacationEnd });
+    };
+
     const tileDisabled = ({ date }: { date: Date }) => {
         const today = startOfDay(new Date());
         const maxDate = new Date(2026, 5, 30); // Junio 30, 2026 (mes 5 = junio, 0-indexed)
         return date < today || date > maxDate;
     };
 
-    // Marcar días cerrados (martes = 2, jueves = 4) en rojo
+    // Marcar días cerrados (martes = 2, jueves = 4) y vacaciones
     const tileClassName = ({ date }: { date: Date }) => {
+        // Período de vacaciones
+        if (isVacationDay(date)) {
+            return 'vacation-day';
+        }
         const dayOfWeek = date.getDay();
         // Martes (2) y Jueves (4) son días cerrados
         if (dayOfWeek === 2 || dayOfWeek === 4) {
@@ -145,46 +157,63 @@ export default function ReservarPage() {
                             {/* Time Slots */}
                             {selectedDate && (
                                 <div className="mt-8 animate-fade-in">
-                                    <div className="flex items-center gap-3 mb-4">
-                                        <Clock className="w-6 h-6 text-[#8b4513]" />
-                                        <h3 className="text-xl font-bold text-[#8b4513]">
-                                            Horarios Disponibles
-                                        </h3>
-                                    </div>
-
-                                    {loading ? (
-                                        <div className="flex items-center justify-center py-12">
-                                            <Loader2 className="w-10 h-10 animate-spin text-[#8b4513]" />
-                                        </div>
-                                    ) : availableSlots.length > 0 ? (
-                                        <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
-                                            {availableSlots.map((slot) => {
-                                                const vilniusTime = toZonedTime(slot, TIMEZONE);
-                                                const timeStr = format(vilniusTime, 'HH:mm');
-                                                const isSelected = selectedSlot && isSameDay(selectedSlot, slot) &&
-                                                    selectedSlot.getTime() === slot.getTime();
-
-                                                return (
-                                                    <button
-                                                        key={slot.toISOString()}
-                                                        onClick={() => setSelectedSlot(slot)}
-                                                        className={`py-4 px-4 rounded-xl font-bold transition-all duration-300 ${isSelected
-                                                            ? 'gradient-primary text-white ring-4 ring-[#daa520] scale-105 shadow-xl'
-                                                            : 'bg-gray-100 dark:bg-[#222] hover:bg-[#8b4513] hover:text-white hover:scale-105 shadow-md hover:shadow-lg'
-                                                            }`}
-                                                    >
-                                                        {timeStr}
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                    ) : (
-                                        <div className="text-center py-12 bg-gray-50 dark:bg-[#222] rounded-xl">
-                                            <XCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                                            <p className="text-gray-600 dark:text-gray-400 font-medium">
-                                                {error || 'No hay horarios disponibles'}
+                                    {isVacationDay(selectedDate) ? (
+                                        <div className="text-center py-12 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/30 rounded-2xl border-2 border-amber-300 dark:border-amber-700">
+                                            <div className="text-6xl mb-4">🏖️</div>
+                                            <h3 className="text-2xl font-bold text-amber-800 dark:text-amber-300 mb-2">
+                                                Cerrado por vacaciones
+                                            </h3>
+                                            <p className="text-amber-700 dark:text-amber-400">
+                                                Del 19 de diciembre al 12 de enero
+                                            </p>
+                                            <p className="text-amber-600 dark:text-amber-500 mt-2 text-sm">
+                                                ¡Nos vemos a la vuelta!
                                             </p>
                                         </div>
+                                    ) : (
+                                        <>
+                                            <div className="flex items-center gap-3 mb-4">
+                                                <Clock className="w-6 h-6 text-[#8b4513]" />
+                                                <h3 className="text-xl font-bold text-[#8b4513]">
+                                                    Horarios Disponibles
+                                                </h3>
+                                            </div>
+
+                                            {loading ? (
+                                                <div className="flex items-center justify-center py-12">
+                                                    <Loader2 className="w-10 h-10 animate-spin text-[#8b4513]" />
+                                                </div>
+                                            ) : availableSlots.length > 0 ? (
+                                                <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
+                                                    {availableSlots.map((slot) => {
+                                                        const vilniusTime = toZonedTime(slot, TIMEZONE);
+                                                        const timeStr = format(vilniusTime, 'HH:mm');
+                                                        const isSelected = selectedSlot && isSameDay(selectedSlot, slot) &&
+                                                            selectedSlot.getTime() === slot.getTime();
+
+                                                        return (
+                                                            <button
+                                                                key={slot.toISOString()}
+                                                                onClick={() => setSelectedSlot(slot)}
+                                                                className={`py-4 px-4 rounded-xl font-bold transition-all duration-300 ${isSelected
+                                                                    ? 'gradient-primary text-white ring-4 ring-[#daa520] scale-105 shadow-xl'
+                                                                    : 'bg-gray-100 dark:bg-[#222] hover:bg-[#8b4513] hover:text-white hover:scale-105 shadow-md hover:shadow-lg'
+                                                                    }`}
+                                                            >
+                                                                {timeStr}
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+                                            ) : (
+                                                <div className="text-center py-12 bg-gray-50 dark:bg-[#222] rounded-xl">
+                                                    <XCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                                                    <p className="text-gray-600 dark:text-gray-400 font-medium">
+                                                        {error || 'No hay horarios disponibles'}
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </>
                                     )}
                                 </div>
                             )}
@@ -496,6 +525,18 @@ export default function ReservarPage() {
         .custom-calendar .closed-day:enabled:hover {
           background: #dc2626 !important;
           color: white !important;
+        }
+
+        /* Días de vacaciones en naranja/ámbar */
+        .custom-calendar .vacation-day {
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+          color: white !important;
+        }
+
+        .custom-calendar .vacation-day:enabled:hover {
+          background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+          color: white !important;
+          transform: scale(1.05) !important;
         }
 
         /* Quitar el color rojo de los fines de semana por defecto */

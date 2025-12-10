@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { auth } from '@/auth';
 import { SignOutButton } from './SignOutButton';
 import { prisma } from '@/lib/prisma';
-import { Scissors } from 'lucide-react';
+import { Scissors, Instagram } from 'lucide-react';
 
 export async function Navbar() {
     const session = await auth();
@@ -32,6 +32,17 @@ export async function Navbar() {
                             AleBarber
                         </span>
                     </Link>
+
+                    {/* Instagram Link */}
+                    <a
+                        href="https://instagram.com/aleepuerto_"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-1.5 md:p-2 bg-white/10 rounded-lg md:rounded-xl hover:bg-gradient-to-br hover:from-pink-500 hover:to-purple-600 transition-all duration-300 hover:scale-110 hover:rotate-6"
+                        aria-label="Síguenos en Instagram"
+                    >
+                        <Instagram className="w-5 h-5 md:w-6 md:h-6" />
+                    </a>
 
                     <div className="flex items-center gap-2 md:gap-6">
                         {session?.user ? (

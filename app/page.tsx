@@ -71,7 +71,7 @@ export default function HomePage() {
               {
                 icon: Euro,
                 title: 'Precio ajustado',
-                description: 'Cortes personalizados sólo por 8€.',
+                description: 'Cortes personalizados solo por 8 €.',
                 delay: '0s'
               },
               {

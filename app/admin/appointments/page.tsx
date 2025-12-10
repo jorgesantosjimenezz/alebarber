@@ -1,13 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Calendar as CalendarIcon, Clock, User } from 'lucide-react';
+import { ArrowLeft, Calendar as CalendarIcon, Clock, User, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toZonedTime } from 'date-fns-tz';
 
 const TIMEZONE = 'Europe/Vilnius';
+
+type SortOrder = 'nearest' | 'furthest';
 
 interface Appointment {
     id: string;
@@ -25,6 +27,16 @@ export default function AdminAppointmentsPage() {
     const [appointments, setAppointments] = useState<Appointment[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [sortOrder, setSortOrder] = useState<SortOrder>('nearest');
+
+    // Sort appointments based on selected order
+    const sortedAppointments = useMemo(() => {
+        return [...appointments].sort((a, b) => {
+            const dateA = new Date(a.startTime).getTime();
+            const dateB = new Date(b.startTime).getTime();
+            return sortOrder === 'nearest' ? dateA - dateB : dateB - dateA;
+        });
+    }, [appointments, sortOrder]);
 
     useEffect(() => {
         fetchAppointments();
@@ -95,6 +107,33 @@ export default function AdminAppointmentsPage() {
                     <p className="text-2xl font-bold">{appointments.length}</p>
                 </div>
 
+                {/* Sorting Controls */}
+                <div className="flex items-center gap-3 mb-6">
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Ordenar por:</span>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setSortOrder('nearest')}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${sortOrder === 'nearest'
+                                    ? 'bg-[#8b4513] text-white shadow-md'
+                                    : 'bg-white dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#222] border border-gray-200 dark:border-gray-700'
+                                }`}
+                        >
+                            <ArrowUp className="w-4 h-4" />
+                            Citas más próximas
+                        </button>
+                        <button
+                            onClick={() => setSortOrder('furthest')}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${sortOrder === 'furthest'
+                                    ? 'bg-[#8b4513] text-white shadow-md'
+                                    : 'bg-white dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#222] border border-gray-200 dark:border-gray-700'
+                                }`}
+                        >
+                            <ArrowDown className="w-4 h-4" />
+                            Citas más lejanas
+                        </button>
+                    </div>
+                </div>
+
                 {/* Appointments Table */}
                 <div className="bg-white dark:bg-[#1a1a1a] rounded-lg shadow-xl overflow-hidden">
                     <div className="overflow-x-auto">
@@ -119,7 +158,7 @@ export default function AdminAppointmentsPage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                {appointments.map((appointment) => {
+                                {sortedAppointments.map((appointment) => {
                                     const vilniusStart = toZonedTime(new Date(appointment.startTime), TIMEZONE);
                                     const vilniusEnd = toZonedTime(new Date(appointment.endTime), TIMEZONE);
 

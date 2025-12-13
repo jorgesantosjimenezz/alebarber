@@ -26,8 +26,14 @@ export async function GET(req: NextRequest) {
             );
         }
 
-        // Get all appointments with user information
+        // Get only pending appointments (startTime >= now) with user information
+        // Past appointments are kept in the database but not shown in admin panel
         const appointments = await prisma.appointment.findMany({
+            where: {
+                startTime: {
+                    gte: new Date(),
+                },
+            },
             include: {
                 user: {
                     select: {
